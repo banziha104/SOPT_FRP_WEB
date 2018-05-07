@@ -1,0 +1,45 @@
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/4.1.0/rx.all.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<button id="btnRequest">클릭</button>
+<p id="dataView">아아아아아</p>
+<script>
+    //의존성주입
+  const btnRequest = document.getElementById("btnRequest");
+  const dataView = document.getElementById("dataView");
+
+  // axios는 http 통신 라이브러리
+  const requestGet = axios.get('https://restcountries.eu/rest/v2/all');
+
+  // click 이벤트 처리
+  Rx.Observable.fromEvent(btnRequest, 'click').subscribe(() => {
+    // axios는 Promise 객체임으로 fromPromise를 통해 Observable 객체를 만들 수 있음
+    // subscribe를 호출한 순간 axios가 작동해 데이터를 받아옮
+    Rx.Observable.fromPromise(requestGet).subscribe((res) => {
+      let obj = res.data;
+      let result = "";
+      for (let i in obj){
+        // 비구조화 할당으로 구조화된 json 객체에서 key-value형식으로 가져옮
+        let { name , capital } = obj[i];
+        result += `${name} 의 수도는 ${capital}입니다 \n`
+      }
+      dataView.innerText = result;
+    })
+  });
+  // const requestGet = axios.get('https://restcountries.eu/rest/v2/all').then((response) => {
+  //   let obj = response.data;
+  //   let result = "";
+  //   for (let i in obj) {
+  //     let {name , capital} = obj[i];
+  //     result += `/ ${name} 의 수도는 ${capital} 입니다 \n`;
+  //   }
+  //   countryData = result;
+  // });
+</script>
+</body>
+</html>

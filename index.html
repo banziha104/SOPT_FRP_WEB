@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/4.1.0/rx.all.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<input type="text" id="txt_id"> <br>
+<input type="text" id="txt_ps"> <br>
+<button id="btn_login">로그인</button>
+<p id="txt_p">아이디랑 비밀번호를 입력해주세요</p>
+<p id="item">icon</p>
+
+<script>
+    //Web Rx 예제
+    // html Document의 의존성을 주입
+  const txtId = document.getElementById('txt_id');
+  const txtPs = document.getElementById('txt_ps');
+  const txtNoti = document.getElementById('txt_p');
+  const btnLogin = document.getElementById('btn_login');
+  const item = document.getElementById('item');
+
+
+  item.style.backgroundColor = 'red';
+  item.style.position = 'relative';
+
+
+  // 텍스트가 입력될떄마다 이벤트를 수신함
+  const txtIdObservable = Rx.Observable.fromEvent(txtId, 'input')
+    .map(event => event.target.value); // event에는 많은 객체가 딸려옮, 그중에 input에 있는 text만 필요함으로 value값으로 변경
+
+  const txtPsObservable = Rx.Observable.fromEvent(txtPs, 'input')
+    .map(event => event.target.value);
+
+  // 텍스트가 입력될때마다 유효성검증
+  txtIdObservable.subscribe((s) => {
+    if(!(s.indexOf('@') > -1)) {
+      txtNoti.innerText = "이메일 형식이 아닙니다"
+    }else if(s.length < 10){
+      txtNoti.innerText = "10자 이상 입력해주세요!"
+    }else{
+      txtNoti.innerText = "사용가능한 아이디입니다"
+    }
+  });
+
+  txtPsObservable.subscribe((s)=>{
+    if(!(s.indexOf('!') > -1 )){
+      txtNoti.innerText = "특수문자를 포함시켜주세요!"
+    }else if(s.length < 10){
+      txtNoti.innerText = "비밀번호는 최소 10자 이상입니"
+    }else{
+      txtNoti.innerText = "사용가능한 패스워드입니다"
+    }
+  });
+
+  // 버튼에서 클릭이벤트에 따른 Observable객체를 만듬
+  const btnLoginObservable = Rx.Observable.fromEvent(btnLogin,'click');
+
+  // 클릭이벤트 처리
+  btnLoginObservable.subscribe(()=> txtNoti.innerText ="클릭되었습니다");
+
+
+  // Rx.Observable.combineLastest(txtIdObservable, txtPsObservable)
+  //   .subscribe((s) => console.log(s));
+    //마우스가 움직일때마다 이벤트를 발행
+  const mouseMoves = Rx.Observable
+    .fromEvent(document, "mousemove")
+    .subscribe(s => {
+      console.log(s);
+      // 마우스의 x축 위치에 따라 색상변경
+      if (s.clientX < 400) item.style.backgroundColor = 'red';
+      else if (s.clientX > 400 && s.clientX < 800) item.style.backgroundColor = 'blue';
+      else item.style.backgroundColor = 'green'
+    });
+</script>
+</body>
+</html>
